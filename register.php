@@ -1,3 +1,102 @@
+<?php
+session_start();
+$con = mysqli_connect("localhost", "root", "", "beats_social"); // Connection variable
+
+if(mysqli_connect_errno())
+{
+  echo "failed to connect: " . mysqli_connect_errno();
+}
+
+// Declaring variables to prevent errors
+$fname = "";
+$lname = "";
+$em = ""; //email
+$em2 = "";
+$username = "";
+$password = "";
+$password2 = "";
+$date = "";
+$error_array = array(); //holds error messages
+
+// if submit is pressed..
+if(isset($_POST['reg_button'])){
+  // First Name
+  $fname = strip_tags($_POST['reg_fname']);// registration form values (strip_tags removes html tags for security)
+  $fname = str_replace(' ', '', $fname);// Remove whitespace
+  $fname = ucfirst(strtolower($fname));// Capitalize only first letter
+  $_SESSION['reg_fname'] = $fname; //Stores first name into session variable
+
+  // Last Name
+  $lname = strip_tags($_POST['reg_lname']); // registration form values (strip_tags removes html tags for security)
+  $lname = str_replace(' ', '', $lname); // Remove whitespace
+  $lname = ucfirst(strtolower($lname)); // Capitalize only first letter
+  $_SESSION['reg_lname'] = $lname; //Stores last name into session variable
+  
+  // Email 1
+  $em = strip_tags($_POST['reg_email']); // registration form values (strip_tags removes html tags for security)
+  $em = str_replace(' ', '', $em); // Remove whitespace
+  $em = strtolower($em); // all lower case
+  $_SESSION['reg_email'] = $em; //Stores email 1 into session variable
+
+  // Email 2
+  $em2 = strip_tags($_POST['reg_email2']); // registration form values (strip_tags removes html tags for security)
+  $em2 = str_replace(' ', '', $em2); // Remove whitespace
+  $em2 = strtolower($em2); // all lower case
+
+  $username = strip_tags($_POST['reg_username']);
+  $username = str_replace(' ', '', $username);
+  $_SESSION['reg_username'] = $username;
+
+  // Password
+  $password = strip_tags($_POST['reg_password']); // registration form values (strip_tags removes html tags for security)
+  $password2 = strip_tags($_POST['reg_password2']); // registration form values (strip_tags removes html tags for security)
+
+  $date = date("Y-m-d"); // Current date
+
+  if($em == $em2) {
+    if(filter_var($em, FILTER_VALIDATE_EMAIL)) {
+      $em = filter_var($em, FILTER_VALIDATE_EMAIL);
+
+      // check if email already exists
+      $e_check = mysqli_query($con, "SELECT email FROM users WHERE email='$em'");
+
+      // count the number of rows returned
+      $num_rows = mysqli_num_rows($e_check);
+
+      if($num_rows > 0) {
+        array_push($error_array, "Email already in use<br>");
+      }
+    } else {
+      array_push($error_array, "Invalid email format<br>");
+    }
+  } else {
+     array_push($error_array, "Emails don't match<br>");
+  }
+
+  if(strlen($fname) > 25 || strlen($fname) < 2) {
+      array_push($error_array, "Your first name must be between 2 and 25 characters<br>");
+  }
+
+  if(strlen($lname) > 25 || strlen($lname) < 2) {
+      array_push($error_array, "Your last name must be between 2 and 25 characters<br>");
+  }
+
+  if($password != $password2) {
+    array_push($error_array, "Passwords don't match<br>");
+  } else {
+    if(preg_match('/[^A-Za-z0-9]/', $password)) {
+      array_push($error_array, "Your password can only contain English characters or numbers<br>");
+    }
+  }
+
+  if(strlen($password) > 30 || strlen($password) < 5) {
+    echo strlen($password);
+    array_push($error_array, "Your password must be between 5 and 30 characters";);
+  }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -18,100 +117,104 @@
   </head>
   <body>
     <div class="container">
-      <div class="row">
-        <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="#">Beats.social</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav w-100">
-              <li class="nav-item">
-                <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Features</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Pricing</a>
-              </li>
-              <li class="nav-item dropdown ml-auto">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Get Started
-                </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                  <a class="dropdown-item" href="#">Login</a>
-                  <a class="dropdown-item active" href="register.php">Register</a>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-      <br>
+      <!-- <?php include "navbar.php" ?> -->
       <div class="row main">
         <div class="main-login main-center">
         <h5>Sign up now -- it's free!</h5>
-          <form class="" method="post" action="#">
+          <form action="register.php" method="POST" role="form">
             <div class="form-group">
-              <label for="name" class="cols-sm-2 control-label">Your Name</label>
+              <label for="reg_fname" class="cols-sm-2 control-label">First Name</label>
               <div class="cols-sm-10">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
-                  <input type="text" class="form-control" name="name" id="name" placeholder="Enter your Name"/>
+                  <input type="text" class="form-control" name="reg_fname" id="reg_fname" placeholder="First Name" value="<?php
+                  if(isset($_SESSION['reg_fname'])) {
+                    echo $_SESSION['reg_fname'];
+                  }
+                  ?>" required>
                 </div>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="email" class="cols-sm-2 control-label">Your Email</label>
+              <label for="reg_lname" class="cols-sm-2 control-label">Last Name</label>
+              <div class="cols-sm-10">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                  <input type="text" class="form-control" name="reg_lname" id="reg_lname" placeholder="Last Name" value="<?php
+                  if(isset($_SESSION['reg_lname'])) {
+                    echo $_SESSION['reg_lname'];
+                  }
+                  ?>" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg_email" class="cols-sm-2 control-label">Your Email</label>
               <div class="cols-sm-10">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
-                  <input type="text" class="form-control" name="email" id="email" placeholder="Enter your Email"/>
+                  <input type="email" class="form-control" name="reg_email" id="reg_email" placeholder="Enter your Email" value="<?php
+                  if(isset($_SESSION['reg_email'])) {
+                    echo $_SESSION['reg_email'];
+                  }
+                  ?>" required>
                 </div>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="username" class="cols-sm-2 control-label">Username</label>
+              <label for="reg_email2" class="cols-sm-2 control-label">Your Email</label>
+              <div class="cols-sm-10">
+                <div class="input-group">
+                  <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                  <input type="email" class="form-control" name="reg_email2" id="reg_email2" placeholder="Confirm your Email" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reg_username" class="cols-sm-2 control-label">Username</label>
               <div class="cols-sm-10">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
-                  <input type="text" class="form-control" name="username" id="username" placeholder="Enter your Username"/>
+                  <input type="text" class="form-control" name="reg_username" id="reg_username" placeholder="Enter your Username" value="<?php
+                  if(isset($_SESSION['reg_username'])) {
+                    echo $_SESSION['reg_username'];
+                  }
+                  ?>" required>
                 </div>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="password" class="cols-sm-2 control-label">Password</label>
+              <label for="reg_password" class="cols-sm-2 control-label">Password</label>
               <div class="cols-sm-10">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-                  <input type="password" class="form-control" name="password" id="password" placeholder="Enter your Password"/>
+                  <input type="password" class="form-control" name="reg_password" id="reg_password" placeholder="Enter your Password" required>
                 </div>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="confirm" class="cols-sm-2 control-label">Confirm Password</label>
+              <label for="reg_passsword2" class="cols-sm-2 control-label">Confirm Password</label>
               <div class="cols-sm-10">
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
-                  <input type="password" class="form-control" name="confirm" id="confirm" placeholder="Confirm your Password"/>
+                  <input type="password" class="form-control" name="reg_password2" id="reg_password2" placeholder="Confirm your Password" required>
                 </div>
               </div>
             </div>
 
-            <div class="form-group ">
-              <a href="http://deepak646.blogspot.in" target="_blank" type="button" id="button" class="btn btn-primary btn-lg btn-block login-button">Register</a>
+            <div class="form-group">
+              <input type="submit" name="reg_button" value="Register">
             </div>
-            
           </form>
         </div>
       </div>
     </div>
-
      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <!-- Popper -->
