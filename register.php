@@ -82,6 +82,24 @@ if(isset($_POST['reg_button'])){
       array_push($error_array, "Your last name must be between 2 and 25 characters<br>");
   }
 
+  if(strlen($username) > 25 || strlen($username) < 5) {
+      array_push($error_array, "Your username must be between 5 and 25 characters<br>");
+  } else if (preg_match('/[^A-Za-z0-9]/', $username)) {
+      array_push($error_array, "Your username can only contain English characters or numbers<br>");
+    } else {
+      // check if username already exists
+      $u_check = mysqli_query($con, "SELECT username FROM users WHERE username='$username'");
+
+      // count the number of rows returned
+      $num_rows2 = mysqli_num_rows($u_check);
+
+      if($num_rows2 > 0) {
+        array_push($error_array, "Username already in use<br>");
+      }
+    }
+  }
+
+
   if($password != $password2) {
     array_push($error_array, "Passwords don't match<br>");
   } else {
@@ -91,9 +109,11 @@ if(isset($_POST['reg_button'])){
   }
 
   if(strlen($password) > 30 || strlen($password) < 5) {
-    echo strlen($password);
     array_push($error_array, "Your password must be between 5 and 30 characters<br>");
   }
+
+  if(empty($error_array)) {
+    $password = md5($password); //Encrypt password before sending to database
 }
 
 ?>
@@ -182,7 +202,7 @@ if(isset($_POST['reg_button'])){
                   <input type="email" class="form-control" name="reg_email2" id="reg_email2" placeholder="Confirm your Email" required>
                   <br>
                 </div>
-              </div
+              </div>
             </div>
 
             <div class="form-group">
@@ -196,6 +216,8 @@ if(isset($_POST['reg_button'])){
                   }
                   ?>" required>
                 </div>
+                <br>
+                <?php if(in_array("Username already in use<br>", $error_array)) echo "<p style='color: #ff0033'>Username already in use"; ?>
               </div>
             </div>
 
