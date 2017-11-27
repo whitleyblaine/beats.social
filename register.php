@@ -18,6 +18,7 @@ $password2 = "";
 $date = "";
 $error_array = array(); //holds error messages
 
+
 // if submit is pressed..
 if(isset($_POST['reg_button'])){
   // First Name
@@ -91,7 +92,7 @@ if(isset($_POST['reg_button'])){
 
   if(strlen($password) > 30 || strlen($password) < 5) {
     echo strlen($password);
-    array_push($error_array, "Your password must be between 5 and 30 characters";);
+    array_push($error_array, "Your password must be between 5 and 30 characters<br>");
   }
 }
 
@@ -132,6 +133,8 @@ if(isset($_POST['reg_button'])){
                     echo $_SESSION['reg_fname'];
                   }
                   ?>" required>
+                  <br>
+                  <?php if(in_array("Your first name must be between 2 and 25 characters<br>", $error_array)) echo "<p style='color: #ff0033'>Your first name must be between 2 and 25 characters</p><br>" ?>
                 </div>
               </div>
             </div>
@@ -147,6 +150,8 @@ if(isset($_POST['reg_button'])){
                   }
                   ?>" required>
                 </div>
+                <br>
+                <?php if(in_array("Your last name must be between 2 and 25 characters<br>", $error_array)) echo "<p style='color: #ff0033'>Your last name must be between 2 and 25 characters</p><br>" ?>
               </div>
             </div>
 
@@ -161,6 +166,11 @@ if(isset($_POST['reg_button'])){
                   }
                   ?>" required>
                 </div>
+                <br>
+                <?php if(in_array("Email already in use<br>", $error_array)) echo "<p style='color: #ff0033'>Email already in use</p><br>";
+                  else if(in_array("Invalid email format<br>", $error_array)) echo "<p style='color: #ff0033'>Invalid email format</p><br>";
+                  else if(in_array("Emails don't match<br>", $error_array)) echo "<p style='color: #ff0033'>Emails don't match</p><br>";
+                 ?>
               </div>
             </div>
 
@@ -170,8 +180,9 @@ if(isset($_POST['reg_button'])){
                 <div class="input-group">
                   <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
                   <input type="email" class="form-control" name="reg_email2" id="reg_email2" placeholder="Confirm your Email" required>
+                  <br>
                 </div>
-              </div>
+              </div
             </div>
 
             <div class="form-group">
@@ -195,6 +206,9 @@ if(isset($_POST['reg_button'])){
                   <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
                   <input type="password" class="form-control" name="reg_password" id="reg_password" placeholder="Enter your Password" required>
                 </div>
+                <br>
+                <?php if(in_array("Your password can only contain English characters or numbers<br>", $error_array)) echo "<p style='color: #ff0033'>Your password can only contain English characters or numbers</p><br>";
+                  else if(in_array("Your password must be between 5 and 30 characters<br>", $error_array)) echo "<p style='color: #ff0033'>Your password must be between 5 and 30 characters</p><br>"; ?>
               </div>
             </div>
 
@@ -205,6 +219,8 @@ if(isset($_POST['reg_button'])){
                   <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
                   <input type="password" class="form-control" name="reg_password2" id="reg_password2" placeholder="Confirm your Password" required>
                 </div>
+                <br>
+                <?php if(in_array("Passwords don't match<br>", $error_array)) echo "<p style='color: #ff0033'>Passwords don't match</p><br>" ?>
               </div>
             </div>
 
