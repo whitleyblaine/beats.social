@@ -8,6 +8,7 @@ if(mysqli_connect_errno())
 }
 
 // Declaring variables to prevent errors
+$account_type = "";
 $fname = "";
 $lname = "";
 $em = ""; //email
@@ -21,6 +22,10 @@ $error_array = array(); //holds error messages
 
 // if submit is pressed..
 if(isset($_POST['reg_button'])){
+  // Account type
+  $account_type = $_POST['reg_account_type'];
+  $_SESSION['reg_account_type'] = $account_type;
+
   // First Name
   $fname = strip_tags($_POST['reg_fname']);// registration form values (strip_tags removes html tags for security)
   $fname = str_replace(' ', '', $fname);// Remove whitespace
@@ -146,6 +151,18 @@ if(isset($_POST['reg_button'])){
         <div class="main-login main-center">
         <h5>Sign up now -- it's free!</h5>
           <form action="register.php" method="POST" role="form">
+            <div class="form-group">
+              <label for="reg_account_type" class="cols-sm-2 control-label">Account Type</label>
+              <div class="cols-sm-10">
+                <div class="input-group">
+                  <select class="form-control" name="reg_account_type" id="reg_account_type">
+                    <option <?php if($_SESSION['reg_account_type'] == "Rapper") echo "selected"?>>Rapper</option>
+                    <option <?php if($_SESSION['reg_account_type'] == "Producer") echo "selected"?>>Producer</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
             <div class="form-group">
               <label for="reg_fname" class="cols-sm-2 control-label">First Name</label>
               <div class="cols-sm-10">
