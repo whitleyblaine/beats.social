@@ -96,6 +96,9 @@ if(isset($_POST['reg_button'])){
       if($num_rows2 > 0) {
         array_push($error_array, "Username already in use<br>");
       }
+
+      // Profile pic assignment
+      $profile_pic = "";
     }
   }
 
