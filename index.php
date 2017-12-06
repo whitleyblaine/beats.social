@@ -5,9 +5,6 @@ if(mysqli_connect_errno())
 {
   echo "failed to connect: " . mysqli_connect_errno();
 }
-
-$query = mysqli_query($con, "DELETE FROM test WHERE id = 2");
-
 ?>
 
 <!DOCTYPE html>
